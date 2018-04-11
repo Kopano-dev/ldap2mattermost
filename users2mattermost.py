@@ -18,7 +18,6 @@ usertemplate = \
       "user": {
         "username": "",
         "email": "",
-        "nickname": "",
         "first_name": "",
         "last_name": "",
         "position": "",
@@ -42,7 +41,6 @@ def getconfig():
         mapping['first_name'] = config.get('mapping', 'first_name')
         mapping['last_name'] = config.get('mapping', 'last_name')
         mapping['email'] = config.get('mapping', 'email')
-        mapping['nickname'] = config.get('mapping', 'nickname')
         mapping['positition'] = config.get('mapping', 'position')
 
         return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, ldap_filter, mapping

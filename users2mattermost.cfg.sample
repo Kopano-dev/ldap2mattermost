@@ -13,5 +13,4 @@ username = uid
 first_name = givenname
 last_name = sn
 email = mail
-nickname = cn
 position = title

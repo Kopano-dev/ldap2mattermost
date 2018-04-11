@@ -70,7 +70,10 @@ def main():
             mmuser = json.loads(usertemplate)
             for attribute in mapping:
                 if mapping[attribute] in result['attributes'] and len(result['attributes'][mapping[attribute]]):
-                    mmuser['user'][attribute] = result['attributes'][mapping[attribute]][0]
+                    if attribute == 'username':
+                        mmuser['user'][attribute] = result['attributes'][mapping[attribute]][0].lower()
+                    else:
+                        mmuser['user'][attribute] = result['attributes'][mapping[attribute]][0]
             output.write('\n' + json.dumps(mmuser))
 
 if __name__ == "__main__":

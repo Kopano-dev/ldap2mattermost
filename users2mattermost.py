@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-import ldap3
+import configparser
 import json
+
+import ldap3
 
 versiontemplate = \
     """{
@@ -24,15 +26,34 @@ usertemplate = \
       }
     }"""
 
-ldap_server = '192.168.10.41'
-bind_dn = 'cn=admin,dc=farmer,dc=lan'
-bind_pass = 'kopano'
-search_base = 'ou=users,dc=farmer,dc=lan'
-ldap_attributes = ['uid', 'givenname', 'sn', 'mail', 'cn', 'title']
-ldap_filter = '(kopanoAccount=1)'
+
+def getconfig():
+    config = configparser.ConfigParser()
+    try:
+        config.read('users2mattermost.cfg')
+        ldap_server = config.get('ldap', 'server')
+        bind_dn = config.get('ldap', 'bind_dn')
+        bind_pass = config.get('ldap', 'bind_pass')
+        search_base = config.get('ldap', 'search_base')
+        ldap_attributes = config.get('ldap', 'attributes').replace(' ', '').split(',')
+        ldap_filter = config.get('ldap', 'filter')
+        mapping = {}
+        mapping['username'] = config.get('mapping', 'username')
+        mapping['first_name'] = config.get('mapping', 'first_name')
+        mapping['last_name'] = config.get('mapping', 'last_name')
+        mapping['email'] = config.get('mapping', 'email')
+        mapping['nickname'] = config.get('mapping', 'nickname')
+        mapping['positition'] = config.get('mapping', 'position')
+
+        return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, ldap_filter, mapping
+    except Exception as e:
+        exit('Configuration {}\nplease check users2mattermost.cfg'.format(e))
 
 
 def main():
+    ldap_server, bind_dn, bind_pass, search_base, \
+    ldap_attributes, ldap_filter, mapping = getconfig()
+
     server = ldap3.Server(ldap_server)
     connection = ldap3.Connection(server, bind_dn, bind_pass, auto_bind=True)
     connection.search(
@@ -45,18 +66,12 @@ def main():
         vt = json.loads(versiontemplate)
         output.write(json.dumps(vt))
 
-        for i in connection.response:
-
-            mm = json.loads(usertemplate)
-            mm['user']['username'] = i['attributes']['uid'][0]
-            mm['user']['first_name'] = i['attributes']['givenname'][0]
-            mm['user']['last_name'] = i['attributes']['sn'][0]
-            mm['user']['email'] = i['attributes']['mail'][0]
-            mm['user']['nickname'] = i['attributes']['cn'][0]
-            if len(i['attributes']['title']):
-                mm['user']['position'] = i['attributes']['title'][0]
-            output.write('\n' + json.dumps(mm))
-
+        for result in connection.response:
+            mmuser = json.loads(usertemplate)
+            for attribute in mapping:
+                if mapping[attribute] in result['attributes'] and len(result['attributes'][mapping[attribute]]):
+                    mmuser['user'][attribute] = result['attributes'][mapping[attribute]][0]
+            output.write('\n' + json.dumps(mmuser))
 
 if __name__ == "__main__":
     main()

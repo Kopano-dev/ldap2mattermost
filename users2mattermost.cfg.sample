@@ -1,0 +1,17 @@
+# LDAP Configuration
+[ldap]
+server = 127.0.01.
+bind_dn = cn=admin,dc=example,dc=com
+bind_pass = root4all
+search_base = ou=users,dc=example,dc=com
+attributes = uid, givenname, sn, mail, cn, title
+filter = (kopanoAccount=1)
+
+# MM to LDAP attribute map
+[mapping]
+username = uid
+first_name = givenname
+last_name = sn
+email = mail
+nickname = cn
+position = title

@@ -1,16 +1,18 @@
 # LDAP Configuration
 [ldap]
-server = 127.0.01.
+server = 127.0.0.1
 bind_dn = cn=admin,dc=example,dc=com
 bind_pass = root4all
 search_base = ou=users,dc=example,dc=com
-attributes = uid, givenname, sn, mail, cn, title
+attributes = uid, givenName, sn, mail, cn, title
 filter = (kopanoAccount=1)
+port = 389
+use_ssl = False
 
-# MM to LDAP attribute map
+# Mattermost to LDAP attribute mapping
 [mapping]
 username = uid
-first_name = givenname
+first_name = givenName
 last_name = sn
 email = mail
 position = title

@@ -36,23 +36,25 @@ def getconfig():
         search_base = config.get('ldap', 'search_base')
         ldap_attributes = config.get('ldap', 'attributes').replace(' ', '').split(',')
         ldap_filter = config.get('ldap', 'filter')
+        port = config.getint('ldap', 'port')
+        use_ssl = config.getboolean('ldap', 'use_ssl')
         mapping = {}
         mapping['username'] = config.get('mapping', 'username')
         mapping['first_name'] = config.get('mapping', 'first_name')
         mapping['last_name'] = config.get('mapping', 'last_name')
         mapping['email'] = config.get('mapping', 'email')
-        mapping['positition'] = config.get('mapping', 'position')
+        mapping['position'] = config.get('mapping', 'position')
 
-        return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, ldap_filter, mapping
+        return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, ldap_filter, port, use_ssl, mapping
     except Exception as e:
         exit('Configuration {}\nplease check users2mattermost.cfg'.format(e))
 
 
 def main():
     ldap_server, bind_dn, bind_pass, search_base, \
-    ldap_attributes, ldap_filter, mapping = getconfig()
+    ldap_attributes, ldap_filter, port, use_ssl, mapping = getconfig()
 
-    server = ldap3.Server(ldap_server)
+    server = ldap3.Server(ldap_server, port=port, use_ssl=use_ssl)
     connection = ldap3.Connection(server, bind_dn, bind_pass, auto_bind=True)
     connection.search(
         search_base=search_base,
@@ -60,7 +62,6 @@ def main():
         attributes=ldap_attributes)
 
     with open('bulk.jsonl', 'w') as output:
-
         vt = json.loads(versiontemplate)
         output.write(json.dumps(vt))
 

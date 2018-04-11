@@ -40,20 +40,22 @@ def main():
         search_filter=ldap_filter,
         attributes=ldap_attributes)
 
-    vt = json.loads(versiontemplate)
-    print(json.dumps(vt))
+    with open('bulk.jsonl', 'w') as output:
 
-    for i in connection.response:
+        vt = json.loads(versiontemplate)
+        output.write(json.dumps(vt))
 
-        mm = json.loads(usertemplate)
-        mm['user']['username'] = i['attributes']['uid'][0]
-        mm['user']['first_name'] = i['attributes']['givenname'][0]
-        mm['user']['last_name'] = i['attributes']['sn'][0]
-        mm['user']['email'] = i['attributes']['mail'][0]
-        mm['user']['nickname'] = i['attributes']['cn'][0]
-        if len(i['attributes']['title']):
-            mm['user']['position'] = i['attributes']['title'][0]
-        print(json.dumps(mm))
+        for i in connection.response:
+
+            mm = json.loads(usertemplate)
+            mm['user']['username'] = i['attributes']['uid'][0]
+            mm['user']['first_name'] = i['attributes']['givenname'][0]
+            mm['user']['last_name'] = i['attributes']['sn'][0]
+            mm['user']['email'] = i['attributes']['mail'][0]
+            mm['user']['nickname'] = i['attributes']['cn'][0]
+            if len(i['attributes']['title']):
+                mm['user']['position'] = i['attributes']['title'][0]
+            output.write('\n' + json.dumps(mm))
 
 
 if __name__ == "__main__":

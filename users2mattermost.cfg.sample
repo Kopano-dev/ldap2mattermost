@@ -16,3 +16,8 @@ first_name = givenName
 last_name = sn
 email = mail
 position = title
+
+[admin]
+account = admin
+password = root4all
+add = True

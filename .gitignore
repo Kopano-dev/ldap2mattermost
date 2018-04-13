@@ -443,3 +443,5 @@ pyvenv.cfg
 pip-selfcheck.json
 
 /bulk.jsonl
+/users2mattermost.cfg
+.vscode

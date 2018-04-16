@@ -44,14 +44,19 @@ def getconfig():
         mapping['last_name'] = config.get('mapping', 'last_name')
         mapping['email'] = config.get('mapping', 'email')
         mapping['position'] = config.get('mapping', 'position')
-        return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, ldap_filter, port, use_ssl, mapping
+        admin = dict()
+        admin['account'] = config.get('admin', 'account')
+        admin['password'] = config.get('admin', 'password')
+        admin['add'] = config.getboolean('admin', 'add')
+        return ldap_server, bind_dn, bind_pass, search_base, ldap_attributes, \
+               ldap_filter, port, use_ssl, mapping, admin
     except Exception as e:
         exit('Configuration {}\nplease check users2mattermost.cfg'.format(e))
 
 
 def main():
     ldap_server, bind_dn, bind_pass, search_base, \
-        ldap_attributes, ldap_filter, port, use_ssl, mapping = getconfig()
+    ldap_attributes, ldap_filter, port, use_ssl, mapping, admin = getconfig()
     server = ldap3.Server(ldap_server, port=port, use_ssl=use_ssl)
     connection = ldap3.Connection(server, bind_dn, bind_pass, auto_bind=True)
     connection.search(
@@ -61,6 +66,12 @@ def main():
 
     with open('bulk.jsonl', 'w') as output:
         output.write(json.dumps(template('version')))
+        if admin['add']:
+            mmuser = template('user')
+            mmuser['username'] = admin['account']
+            mmuser['password'] = admin['password']
+            mmuser['roles'] = "system_admin system_user"
+            output.write('\n' + json.dumps(mmuser))
         for result in connection.response:
             mmuser = template('user')
             for attribute in mapping:

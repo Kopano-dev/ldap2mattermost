@@ -1,4 +1,3 @@
-
 # Ldap2Mattermost script
 
 ## Requirements
@@ -25,7 +24,7 @@ This will write a file called bulk.jsonl this file will contain the users which 
 ### Validate the bulk.jsonl file
 
 ```bash
-root@mattermost:/opt/mattermost/bin# ./platform import bulk -c /etc/mattermost/config.json /root/bulk.jsonl 
+root@mattermost:/opt/mattermost/bin# ./platform import bulk -c /etc/mattermost/config.json /root/bulk.jsonl
 [2018/04/11 15:10:21 CEST] [INFO] Loaded system translations for 'en' from '/opt/mattermost/i18n/en.json'
 [2018/04/11 15:10:21 CEST] [INFO] Server is initializing...
 [2018/04/11 15:10:21 CEST] [INFO] Pinging SQL master database
